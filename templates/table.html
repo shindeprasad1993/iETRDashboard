@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width", initial-scale="1.0" />
+		<title>iETR Management System</title>
+		<link rel="stylesheet" href="/static/style.css" />
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />    
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script type='text/javascript'>
+$(document).ready(function(){
+  
+ // Show Input element
+ $('.edit').click(function(){
+  $('.txtedit').hide();
+  $(this).next('.txtedit').show().focus();
+  $(this).hide();
+ });
+
+ // Save data
+ $(".txtedit").focusout(function(){
+   
+  // Get edit id, field name and value
+  var id = this.id;
+  var split_id = id.split("_");
+  var field_name = split_id[0];
+  var edit_id = split_id[1];
+  var value = $(this).val();
+   
+  // Hide Input element
+  $(this).hide();
+ 
+  // Hide and Change Text of the container with input elmeent
+  $(this).prev('.edit').show();
+  $(this).prev('.edit').text(value);
+ 
+  $.ajax({
+   url: '/update',
+   type: 'post',
+   data: { field:field_name, value:value, id:edit_id },
+   success:function(response){
+      if(response == 1){ 
+         console.log('Save successfully'); 
+      }else{ 
+         console.log("Not saved.");  
+      }
+   }
+  });
+  
+ });
+
+});
+</script>
+	</head>
+	<body>
+		<table class="table">
+			<tr class="table_header">
+				{% for header in headings %}
+				<th class="table_cell">{{ header }}</th>
+				{% endfor %}
+			</tr>
+			{% for row in data %}
+			<tr class="table_row">
+				{% for cell in row %}
+					{% if loop.index == 4 %}
+    						<td class="table_cell">
+							<div class='edit' > {{ cell }} </div>
+							<input type='text' class='txtedit' value='{{ cell }}' id='ETR_{{row.OUTAGE_NO}}'>
+						</td>    						 
+					{% else %}
+    						<td class="table_cell"> {{ cell }} </td>
+					{% endif %}				
+				{% endfor %}
+			</tr>
+			{% endfor %}
+		</table>
+	</body>
+</html>
